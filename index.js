@@ -1,9 +1,10 @@
-var http = require ('https');
+var http = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
+const ejs = require("ejs");
 const { cookieKey } = require("./config/keys");
 
 const app = express();
@@ -21,7 +22,8 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+app.use(express.static(__dirname + "/client/"));
+app.set("view engine", "ejs");
 // Database Connection (Change accordingly)
 const connection = mysql.createConnection({
   host: "localhost",
@@ -37,13 +39,26 @@ connection.connect(err => {
     console.log("Error in connecting with database");
   }
 });
-app.get('/',function(req,res){
-  res.sendfile("client/index.html");
-})
+
+// Handling the loading routes
+
+app.get("/", function(req, res) {
+  // res.sendFile("client/index.html");
+  res.render("index");
+});
+app.get("/user/login", (req, res) => {
+  res.render("login");
+});
+app.get("/user/register", (req, res) => {
+  res.render("register");
+});
+
+// Post routes to handle the user related logic
+
 // Post route for registeration of new user
 app.post("/user/register", (req, res) => {
   const newUser = req.body.user;
-  console.log(user);
+  console.log(newUser);
 
   // TABLE NAME IS user_reg (CHANGE THE NAME ACCORDINGLY)
   connection.query(
@@ -55,7 +70,7 @@ app.post("/user/register", (req, res) => {
       }
       if (results.length > 0) {
         console.log("User already exists with same username or email");
-        res.redirect("/user/new"); // redirect back to the registration form
+        return res.redirect("/user/register"); // redirect back to the registration form
       }
 
       // make sure the newUser's keys matches with table's field names OR change the query accordingly
@@ -84,6 +99,7 @@ app.post("/user/register", (req, res) => {
 });
 
 // Post route for login
+
 app.post("/user/login", (req, res) => {
   const username = String(req.body.username);
   const password = String(req.body.password);
@@ -96,11 +112,11 @@ app.post("/user/login", (req, res) => {
       }
       if (results.length === 0) {
         console.log("No User Found with given username");
-        res.redirect("/user/login/form"); // redirect back to login form
+        res.redirect("/user/login"); // redirect back to login form
       } else {
         if (results[0].password !== password) {
           console.log("Wrong password");
-          res.redirect("/user/login/form"); // redierct back to login form
+          res.redirect("/user/login"); // redierct back to login form
         } else {
           console.log("Username and password matches");
           req.session.token = results[0].email;
@@ -131,8 +147,8 @@ app.get("/get-user", (req, res) => {
   }
 });
 
-// Post route for logout
-app.post("/logout", (req, res) => {
+// Get route for logout
+app.get("/logout", (req, res) => {
   req.session = null;
   console.log("Successfully logged out");
   res.redirect("/"); // redirect back to root route after log out
