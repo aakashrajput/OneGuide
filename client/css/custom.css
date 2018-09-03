@@ -1,0 +1,40 @@
+
+.anchor-style {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #fff;
+  border: none;
+  color: #333;
+  text-align: center;
+  font-size: 2em;
+  padding: 10px;
+  width: ;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 20px;
+}
+
+.anchor-style span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.anchor-style span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.anchor-style:hover span {
+  padding-right: 25px;
+}
+
+.anchor-style:hover span:after {
+  opacity: 1;
+  right: 0;
+}
