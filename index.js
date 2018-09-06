@@ -161,7 +161,7 @@ app.post("/include-fields", (req, res) => {
     fields
   };
   connection.query(
-    "INSERT INTO user_reg SET career_fields=? WHERE email=?",
+    "UPDATE user_reg SET career_fields=? WHERE email=?",
     [JSON.stringify(obj), req.session.token],
     (err, results, fields) => {
       if (err) {
