@@ -154,6 +154,25 @@ app.get("/logout", (req, res) => {
   res.redirect("/"); // redirect back to root route after log out
 });
 
+// Include fields
+app.post("/include-fields", (req, res) => {
+  const fields = req.body;
+  const obj = {
+    fields
+  };
+  connection.query(
+    "UPDATE user_reg SET career_fields=? WHERE email=?",
+    [JSON.stringify(obj), req.session.token],
+    (err, results, fields) => {
+      if (err) {
+        throw err;
+      } else {
+        res.send("Added");
+      }
+    }
+  );
+});
+
 // Setting up server
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
